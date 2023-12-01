@@ -1,0 +1,1 @@
+just a project to identify korean singers based on image that user feeds to it
