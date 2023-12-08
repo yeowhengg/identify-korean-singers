@@ -1,10 +1,8 @@
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from . import models, schemas
 
-
-def get_image_data(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.ImagePath).offset(skip).limit(limit).all()
 
 async def insert_image_data(db: Session, image_data: schemas.UploadStatus):
     data_to_insert = models.ImagePath(path = image_data)
@@ -17,3 +15,11 @@ async def insert_image_data(db: Session, image_data: schemas.UploadStatus):
     
     except Exception as e:
         return False
+    
+async def processed_idols(db: Session, image_to_update):
+    upd = update(models.ImagePath)
+    cond = upd.where(models.ImagePath.path == image_to_update)
+    val = cond.values(is_processed=True)
+    db.execute(val)
+    db.commit()
+    return False
