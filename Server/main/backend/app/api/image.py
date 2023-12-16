@@ -1,3 +1,5 @@
+import os
+
 from typing import Annotated
 import uuid
 
@@ -8,6 +10,12 @@ import requests
 
 from database import schemas, crud
 from database.database import get_db
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+AI_IP = os.getenv("AI_IP")
 
 router = APIRouter()
 
@@ -37,7 +45,7 @@ async def create_upload_files(
             with open(full_image_path, 'rb') as f:
                 print(full_image_path)
                 read_files = {"file": (full_image_path, f.read())}
-                res = requests.post("http://127.0.0.1:8001", files=read_files)
+                res = requests.post(AI_IP, files=read_files)
                 if res.status_code == 200:
                     update_status = await crud.processed_idols(db, full_image_path)
                     if update_status is False:
