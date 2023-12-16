@@ -4,5 +4,9 @@ open terminal, navigate directory to main folder and do pip install -r requireme
 
 to start up the api:
 
-1. cd .\main\backend
+1. cd .\Server\main\backend\
 2. uvicorn app.main:app --reload
+
+
+to start up the telegram bot:
+simply run bot.py with py bot.py
