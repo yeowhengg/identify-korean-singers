@@ -16,7 +16,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 AI_IP = os.getenv("AI_IP")
-
 router = APIRouter()
 
 IMAGE_FOLDER_PATH = "./images"

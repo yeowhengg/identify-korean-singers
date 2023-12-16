@@ -11,7 +11,7 @@ from database.database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(root_path="/api/v1")
 
 
 @app.on_event("startup")

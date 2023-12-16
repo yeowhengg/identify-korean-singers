@@ -1,0 +1,40 @@
+version: '2.1'
+
+services:
+  backend:
+    container_name: backend
+    networks:
+      - default
+      - internal-network
+    build: ./Server
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      caddy:
+        condition: service_started
+    restart: always
+    volumes:
+      - ./Server/main/backend:/code/main/backend
+
+  caddy:
+    container_name: proxy
+    environment:
+      BACKEND_IP: ${BACKEND_IP}
+    image: caddy:2.6.2-alpine
+    ports:
+      - '443:443'
+      - '80:80'
+      - '8000:8000'
+    restart: always
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_config: null
+  caddy_data: null
+
+networks:
+  internal-network:
+    name: internal-network
+    driver: bridge
