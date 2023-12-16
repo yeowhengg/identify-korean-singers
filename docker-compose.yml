@@ -4,6 +4,7 @@ services:
   backend:
     container_name: backend
     environment:
+      DOMAIN: ${DOMAIN}
       AI_IP: ${AI_IP}    
     networks:
       - default
@@ -21,11 +22,12 @@ services:
     container_name: telegram-bot
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
+      API_URL: ${API_URL}
     networks:
       - default
       - internal-network
     build: ./TelegramBot
-    command: python3 bot.py
+    command: python3 -u bot.py
     restart: always
     volumes:
       - ./TelegramBot:/code
@@ -44,7 +46,7 @@ services:
   caddy:
     container_name: proxy
     environment:
-      BACKEND_IP: ${BACKEND_IP}
+      DOMAIN: ${DOMAIN}
     image: caddy:2.6.2-alpine
     ports:
       - '443:443'

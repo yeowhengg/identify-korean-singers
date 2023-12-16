@@ -13,12 +13,15 @@ from database.database import get_db
 
 from dotenv import load_dotenv
 
+import json
+
 load_dotenv()
 
 AI_IP = os.getenv("AI_IP")
-router = APIRouter()
 
 IMAGE_FOLDER_PATH = "./images"
+
+router = APIRouter()
 
 
 # TODO: To replace all 'breaks' with raise response
@@ -42,9 +45,9 @@ async def create_upload_files(
             path.append(full_image_path)
 
             with open(full_image_path, 'rb') as f:
-                print(full_image_path)
                 read_files = {"file": (full_image_path, f.read())}
                 res = requests.post(AI_IP, files=read_files)
+
                 if res.status_code == 200:
                     update_status = await crud.processed_idols(db, full_image_path)
                     if update_status is False:
@@ -58,6 +61,15 @@ async def create_upload_files(
     return {"result": "successfully uploaded", "path": path} if status else {"result": "failed to upload", "failure_reason": "..?"}
 
 
-@router.post("/sendidoldetails/", response_model=schemas.IdolDetails)
-def test(data: schemas.IdolDetails):
-    return data
+@router.get("/getidoldetails/{image_path}", response_model=schemas.IdolDetails)
+async def test(image_path: str, db: Session = Depends(get_db)):
+    res = await crud.retrieve_idol_details(db, image_path)
+    for i in res:
+        data = i[0].data
+
+    formatted_data = {"idol_details":
+                      json.loads(data)
+                      }
+
+    print(formatted_data)
+    return formatted_data

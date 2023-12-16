@@ -26,7 +26,7 @@ class ImageHandler(SimpleHTTPRequestHandler):
 
                 self.send_response(200)
                 self.end_headers()
-                self.wfile.write(b'Image received and saved successfully')
+                self.wfile.write(f"{full_path}".encode("utf-8"))
                 return
 
         self.send_response(400)

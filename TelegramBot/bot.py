@@ -2,22 +2,30 @@ import os
 from dotenv import load_dotenv
 from telebot import TeleBot
 import requests
+import json
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
-API_URL = "http://backend:8000/"
+API_URL = os.getenv('API_URL')
+print(API_URL)
 
 bot = TeleBot(BOT_TOKEN)
 
 
-def send_image(local_file_path):
+def send_image(local_file_path) -> requests.Response:
 
     url = f'{API_URL}uploadfiles/'
-    print(url)
     file_path = f"https://api.telegram.org/file/bot{BOT_TOKEN}/photos/{local_file_path}"
     get_image_res = requests.get(file_path)
     read_files = {"files": (local_file_path, get_image_res.content)}
     response = requests.post(url, files=read_files)
+
+    return response
+
+
+def get_details(path):
+    url = f'{API_URL}getidoldetails/{path}'
+    response = requests.get(url)
 
     return response
 
@@ -32,20 +40,22 @@ def handle_photo(message):
         if file_path.endswith(".jpg"):
             photo_id_tag = message.id
 
-            bot.send_message(message.chat.id, "processing image",
-                             reply_to_message_id=photo_id_tag)
             print(f"sending image to server... {file_path}")
             status = send_image(file_path)
-
             if status.status_code == 200:
+                get_path = json.loads(
+                    status.content.decode("utf-8"))['path'][0]
 
-                # rantext to be replaced with idol description
-                # placeholder# details over here should be the description of idols. Callback is handled by 127.0.0.1 backend
-                import random as ran
-                randomstuff = ["1", "2", "3", "4"]
-                rantext = ran.choice(randomstuff)
-                bot.send_message(message.chat.id, rantext,
-                                 reply_to_message_id=photo_id_tag)
+                details_status = get_details(
+                    str(get_path).replace("/images", ""))
+
+                if details_status.status_code == 200:
+                    content = json.loads(details_status.content)[
+                        "idol_details"]["idol_1"]
+                    format_data = f"Name: {content['name']}\nAge: {content['age']}\nDoB: {content['dob']}\nGroup: {content['group']}\nSummary: {content['summary']}"
+
+                    bot.send_message(message.chat.id, format_data,
+                                     reply_to_message_id=photo_id_tag)
 
             else:
                 bot.send_message(message.chat.id,
