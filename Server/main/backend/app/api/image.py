@@ -35,12 +35,16 @@ async def create_upload_files(
             path.append(full_image_path)
 
             with open(full_image_path, 'rb') as f:
+                print(full_image_path)
                 read_files = {"file": (full_image_path, f.read())}
                 res = requests.post("http://127.0.0.1:8001", files=read_files)
                 if res.status_code == 200:
                     update_status = await crud.processed_idols(db, full_image_path)
                     if update_status is False:
                         break
+
+                if res.status_code == 422:
+                    print("something went wrong..")
         else:
             break
 

@@ -22,4 +22,4 @@ async def processed_idols(db: Session, image_to_update):
     val = cond.values(is_processed=True)
     db.execute(val)
     db.commit()
-    return False
+    return True
