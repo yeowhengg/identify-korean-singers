@@ -5,13 +5,15 @@ import requests
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+API_URL = "http://backend:8000/"
 
 bot = TeleBot(BOT_TOKEN)
 
 
 def send_image(local_file_path):
 
-    url = 'http://127.0.0.1:8000/uploadfiles/'
+    url = f'{API_URL}uploadfiles/'
+    print(url)
     file_path = f"https://api.telegram.org/file/bot{BOT_TOKEN}/photos/{local_file_path}"
     get_image_res = requests.get(file_path)
     read_files = {"files": (local_file_path, get_image_res.content)}

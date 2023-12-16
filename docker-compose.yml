@@ -3,6 +3,8 @@ version: '2.1'
 services:
   backend:
     container_name: backend
+    environment:
+      AI_IP: ${AI_IP}    
     networks:
       - default
       - internal-network
@@ -14,6 +16,30 @@ services:
     restart: always
     volumes:
       - ./Server/main/backend:/code/main/backend
+  
+  telegram-bot:
+    container_name: telegram-bot
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+    networks:
+      - default
+      - internal-network
+    build: ./TelegramBot
+    command: python3 bot.py
+    restart: always
+    volumes:
+      - ./TelegramBot:/code
+
+  ai-server:
+    container_name: ai-server
+    networks:
+      - default
+      - internal-network
+    build: ./SimpleHTTPServer
+    command: python3 start_server.py
+    restart: always
+    volumes:
+      - ./SimpleHTTPServer:/code
 
   caddy:
     container_name: proxy
