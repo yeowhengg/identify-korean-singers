@@ -1,11 +1,12 @@
 from typing import Annotated
+import uuid
+
 from fastapi import APIRouter, Depends
 from fastapi import File, UploadFile
 from sqlalchemy.orm import Session
-import uuid
 import requests
 
-from database import models, schemas, crud
+from database import schemas, crud
 from database.database import get_db
 
 router = APIRouter()
@@ -13,7 +14,7 @@ router = APIRouter()
 IMAGE_FOLDER_PATH = "./images"
 
 
-#TODO: To replace all 'breaks' with raise response
+# TODO: To replace all 'breaks' with raise response
 @router.post("/uploadfiles/", response_model=schemas.UploadStatus, response_model_exclude_none=True)
 async def create_upload_files(
     files: Annotated[list[UploadFile], File(description="Multiple files as UploadFile")], db: Session = Depends(get_db),
@@ -26,8 +27,8 @@ async def create_upload_files(
         filename = f"{uuid.uuid4()}.jpg"
         content = await file.read()
         full_image_path = f"{IMAGE_FOLDER_PATH}/{filename}"
-        
         status = await crud.insert_image_data(db, full_image_path)
+
         if status:
             with open(full_image_path, "wb") as f:
                 f.write(content)
@@ -38,12 +39,12 @@ async def create_upload_files(
                 res = requests.post("http://127.0.0.1:8001", files=read_files)
                 if res.status_code == 200:
                     update_status = await crud.processed_idols(db, full_image_path)
-                    if update_status == False:
+                    if update_status is False:
                         break
         else:
             break
-    
-    return {"result": "successfully uploaded", "path":path} if status else {"result": "failed to upload", "failure_reason": "..?"}
+
+    return {"result": "successfully uploaded", "path": path} if status else {"result": "failed to upload", "failure_reason": "..?"}
 
 
 @router.post("/sendidoldetails/", response_model=schemas.IdolDetails)
