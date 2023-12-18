@@ -41,7 +41,7 @@ async def processed_idols(db: Session, image_to_update):
 
 
 async def retrieve_idol_details(db: Session, path):
-    updated_path = "./images/"+path
+    updated_path = "./images/"+path+".jpg"
 
     stmt = select(models.ImagePath).where(
         models.ImagePath.path == updated_path)

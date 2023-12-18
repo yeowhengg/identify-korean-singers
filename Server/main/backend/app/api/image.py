@@ -65,6 +65,7 @@ async def create_upload_files(
 async def test(image_path: str, db: Session = Depends(get_db)):
     res = await crud.retrieve_idol_details(db, image_path)
     data = {}
+
     for i in res:
         data = i[0].data
 
