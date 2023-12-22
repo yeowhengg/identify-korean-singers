@@ -6,7 +6,7 @@ import json
 # when AI server is done and set up, this function will be called after it sends back the details
 
 
-async def insert_image_data(db: Session, upload_status: schemas.UploadStatus):
+async def insert_image_data(db: Session, upload_status: schemas.UploadStatusBase):
     data_to_insert = models.ImagePath(path=upload_status)
 
     try:
@@ -35,8 +35,12 @@ async def processed_idols(db: Session, image_to_update):
     })
 
     )
-    db.execute(val)
-    db.commit()
+    try:
+        db.execute(val)
+        db.commit()
+    except Exception as e:
+        return False
+
     return True
 
 
@@ -45,6 +49,11 @@ async def retrieve_idol_details(db: Session, path):
 
     stmt = select(models.ImagePath).where(
         models.ImagePath.path == updated_path)
-    result = db.execute(stmt)
+
+    try:
+        result = db.execute(stmt).one()
+        print(result)
+    except Exception as e:
+        return False
 
     return result

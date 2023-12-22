@@ -3,15 +3,11 @@ from pydantic import BaseModel, Field
 
 
 class UploadStatusBase(BaseModel):
+    path: list[str] = None
+
+
+class EmptyFileUploaded(BaseModel):
     result: str
-
-
-class UploadStatus(UploadStatusBase):
-    path: list[Optional[str]] = None
-    failure_reason: Optional[str] = None
-
-# class ImageRetrivalBase(BaseModel):
-#     blobstr: str
 
 
 class IdolDetailsBase(BaseModel):
